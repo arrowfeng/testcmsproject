@@ -418,6 +418,6 @@ webpackJsonp([18], {
             return u
         });
         var r = "", u = void 0;
-        r = "//localhost:9999", u = "//localhost:9999/img/"
+        r = "//127.0.0.1:9999", u = "//127.0.0.1:9999/img/"
     }
 }, [120]);

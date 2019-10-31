@@ -1,8 +1,8 @@
 package datasource
 
 import (
-	"github.com/go-xorm/xorm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-xorm/xorm"
 	"irisDemo/CMSProject/model"
 )
 
@@ -24,11 +24,13 @@ func NewMysqlEngine() *xorm.Engine {
 	 * 自动警告字段的默认值，是否为空信息在模型和数据库之间不匹配的情况
 	 */
 	//Sync2是Sync的基础上优化的方法
-
-	err = engine.Sync2(new(model.Admin),
+	err = engine.Sync2(new(model.Permission),
 		new(model.City),
-		new(model.Permission),
-		new(model.AdminPermission),
+		new(model.Admin),
+		new(model.User),
+		new(model.UserOrder),
+		new(model.Address),
+		new(model.Shop),
 		new(model.OrderStatus))
 
 	if err != nil {
@@ -40,5 +42,3 @@ func NewMysqlEngine() *xorm.Engine {
 
 	return engine
 }
-
-

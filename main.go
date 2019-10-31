@@ -10,6 +10,7 @@ import (
 	_ "github.com/kataras/iris/sessions"
 	"irisDemo/CMSProject/config"
 	"irisDemo/CMSProject/controller"
+	"irisDemo/CMSProject/datasource"
 	"irisDemo/CMSProject/service"
 	"time"
 	_ "time"
@@ -26,9 +27,9 @@ func main() {
 	config := config.InitConfig()
 	addr := ":" + config.Port
 	app.Run(
-		iris.Addr(addr),      //监听地址
-		iris.WithoutServerError(iris.ErrServerClosed),     //无服务的错误提示
-		iris.WithOptimizations,       //对json序列化更快
+		iris.Addr(addr), //监听地址
+		iris.WithoutServerError(iris.ErrServerClosed), //无服务的错误提示
+		iris.WithOptimizations,                        //对json序列化更快
 	)
 
 }
@@ -90,8 +91,11 @@ func mvcHandle(app *iris.Application) {
 		Expires: 24 * time.Hour,
 	})
 
+	engine := datasource.NewMysqlEngine()
+
 	//管理员功能模块
-	adminService := service.NewAdminService()
+	//  /admin/xxx
+	adminService := service.NewAdminService(engine)
 
 	admin := mvc.New(app.Party("/admin"))
 	admin.Register(
@@ -100,6 +104,36 @@ func mvcHandle(app *iris.Application) {
 	)
 	admin.Handle(new(controller.AdminController))
 
-	//用户功能模块
+	//统计功能模块
+	//  /statis/{}/{}/xxx
+	statisService := service.NewStatisService(engine)
 
+	statis := mvc.New(app.Party("/statis/{model}/{date}/"))
+	statis.Register(
+		statisService,
+		sessManager.Start,
+	)
+	statis.Handle(new(controller.StatisController))
+
+	//用户功能模块
+	// /v1/users/xxx
+	userService := service.NewUserService(engine)
+
+	user := mvc.New(app.Party("/v1/users"))
+	user.Register(
+		userService,
+		sessManager.Start,
+	)
+	user.Handle(new(controller.UserController))
+
+	//订单功能模块
+	// /bos/orders/xxx
+	orderService := service.NewOrderService(engine)
+
+	order := mvc.New(app.Party("/bos/orders"))
+	order.Register(
+		orderService,
+		sessManager.Start,
+	)
+	order.Handle(new(controller.OrderController))
 }

@@ -1,12 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"github.com/go-xorm/xorm"
-	"irisDemo/CMSProject/datasource"
 	"irisDemo/CMSProject/model"
+	"math/rand"
 )
-
-var engine = datasource.NewMysqlEngine()
 
 type AdminService interface {
 	//校验管理员信息
@@ -19,8 +18,8 @@ type adminService struct {
 	engine *xorm.Engine
 }
 
-func NewAdminService() AdminService{
-	return &adminService{engine:engine}
+func NewAdminService(engine *xorm.Engine) AdminService {
+	return &adminService{engine: engine}
 }
 
 func (as *adminService) GetByAdminNameAndPwd(name, pwd string) (model.Admin, bool) {
@@ -30,5 +29,13 @@ func (as *adminService) GetByAdminNameAndPwd(name, pwd string) (model.Admin, boo
 }
 
 func (as *adminService) GetAdminCount() (int64, error) {
-	return as.engine.Count(new(model.Admin))
+	result, err := as.engine.Count(new(model.Admin))
+
+	if err != nil {
+		panic(err.Error())
+		return 0, err
+	}
+
+	fmt.Println(result)
+	return int64(rand.Intn(100)), nil
 }
